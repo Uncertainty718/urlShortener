@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	
 )
 
 var (
@@ -50,7 +49,7 @@ func TestSaveData(t *testing.T) {
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
-			err := storage.SaveData(tc.og, tc.short)
+			_, err := storage.SaveData(tc.og, tc.short)
 			assert.Equal(t, tc.err, err)
 			if tc.prep == 2 {
 				return

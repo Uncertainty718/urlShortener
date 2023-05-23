@@ -32,7 +32,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method,
 
 func TestRouter(t *testing.T) {
 	repo := storage.NewInmem()
-	if err := repo.SaveData("https://gigle.com", "short"); err != nil {
+	if _, err := repo.SaveData("https://gigle.com", "short"); err != nil {
 		panic(err)
 	}
 	r := NewHandler(repo)

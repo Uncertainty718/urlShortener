@@ -38,7 +38,8 @@ func (h *Handler) SaveURL() http.HandlerFunc {
 		}
 		defer r.Body.Close()
 		service.Shorten()
-		if err := h.Repo.SaveData(service.OriginalURL, service.ShortURL); err != nil {
+		shortened, err := h.Repo.SaveData(service.OriginalURL, service.ShortURL)
+		if err != nil {
 			if err == errNotUnique {
 				service.Reshorten(service.ShortURL)
 			}
@@ -46,7 +47,7 @@ func (h *Handler) SaveURL() http.HandlerFunc {
 
 		encoder := json.NewEncoder(w)
 		encoder.SetEscapeHTML(false)
-		encoder.Encode(service.ShortURL)
+		encoder.Encode(shortened)
 		w.Header().Set("Content-Type", "application/json")
 
 		w.WriteHeader(http.StatusOK)

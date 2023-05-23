@@ -24,15 +24,15 @@ func NewInmem() *Inmem {
 	return memstor
 }
 
-func (storage *Inmem) SaveData(og, short string) error {
+func (storage *Inmem) SaveData(og, short string) (string, error) {
 	storage.lock.Lock()
 	defer storage.lock.Unlock()
 	if err := storage.uniqueCheck(og, short); err != nil {
-		return err
+		return "", err
 	}
 	storage.origUrls[og] = 1
 	storage.urlList[short] = og
-	return nil
+	return short, nil
 }
 
 func (storage *Inmem) GetData(short string) (string, error) {
