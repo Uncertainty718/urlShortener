@@ -13,9 +13,9 @@ const (
 )
 
 type Shortener struct {
-	OriginalURL string
-	ShortURL    string
-	randomizer  *rand.Rand
+	OriginalURL string     `json:"originalurl"`
+	ShortURL    string     `json:"shorturl"`
+	randomizer  *rand.Rand `json:"-"`
 }
 
 func NewShortener() *Shortener {
@@ -24,11 +24,17 @@ func NewShortener() *Shortener {
 	}
 }
 
-func (s *Shortener) Shorten(originalURL string) {
-	s.OriginalURL = originalURL
+func (s *Shortener) Shorten() {
 	b := make([]byte, urlLen)
 	for i := range b {
 		b[i] = charset[s.randomizer.Intn(len(charset))]
 	}
 	s.ShortURL = myDomain + string(b)
+}
+
+func (s *Shortener) Reshorten(short string) {
+	s.Shorten()
+	if s.ShortURL == short {
+		s.Reshorten(s.ShortURL)
+	}
 }
