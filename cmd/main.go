@@ -9,12 +9,11 @@ import (
 	"github.com/uncertainty718/urlshortener/internal/handlers"
 	inmem "github.com/uncertainty718/urlshortener/internal/storage/inmem"
 	pg "github.com/uncertainty718/urlshortener/internal/storage/pg"
-
 )
 
 func main() {
 
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading environment")
 	}
@@ -22,7 +21,7 @@ func main() {
 	var r *handlers.Handler
 
 	storageType := os.Getenv("REPO")
-	switch storageType{
+	switch storageType {
 	case "in-memory":
 		repo := inmem.NewInmem()
 		r = handlers.NewHandler(repo)

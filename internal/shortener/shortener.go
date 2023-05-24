@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-// var (
-// 	charset  = os.Getenv("CHARSET")
-// 	urlLen   = os.Getenv("LENGTH")
-// 	myDomain = os.Getenv("DOMAIN")
-// )
-
 type Shortener struct {
 	OriginalURL string     `json:"originalurl"`
 	ShortURL    string     `json:"shorturl"`
@@ -23,6 +17,8 @@ type Shortener struct {
 	myDomain    string     `json:"-"`
 }
 
+// Creates new instance of Shortener service.
+// Uses env variables to fill inner fields.
 func NewShortener() *Shortener {
 	return &Shortener{
 		randomizer: rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -32,10 +28,12 @@ func NewShortener() *Shortener {
 	}
 }
 
+// Creates random URL, which satisfies given conditions.
+// Fatal if URL lenght condition is empty.
 func (s *Shortener) Shorten() {
 	intLen, err := strconv.Atoi(s.urlLen)
 	if err != nil {
-		log.Fatal("I'm down ", err)
+		log.Fatal(err)
 	}
 	b := make([]byte, intLen)
 	for i := range b {
@@ -44,6 +42,8 @@ func (s *Shortener) Shorten() {
 	s.ShortURL = s.myDomain + string(b)
 }
 
+// Generates new short URL.
+// Used for preserving URL unique condition.
 func (s *Shortener) Reshorten(short string) {
 	s.Shorten()
 	if s.ShortURL == short {
