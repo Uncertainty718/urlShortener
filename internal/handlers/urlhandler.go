@@ -10,7 +10,10 @@ import (
 	"github.com/uncertainty718/urlshortener/internal/storage"
 )
 
-var errNotUnique error = errors.New("not unique original url")
+var (
+	errNotUnique         = errors.New("not unique original url")
+	errNotUniqueShortUrl = errors.New("not unique short url")
+)
 
 type Handler struct {
 	*chi.Mux
@@ -40,9 +43,14 @@ func (h *Handler) SaveURL() http.HandlerFunc {
 		service.Shorten()
 		shortened, err := h.Repo.SaveData(service.OriginalURL, service.ShortURL)
 		if err != nil {
-			if err == errNotUnique {
+			if err == errNotUniqueShortUrl {
 				service.Reshorten(service.ShortURL)
+				shortened = service.ShortURL
 			}
+			if err == errNotUnique {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			}
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 		encoder := json.NewEncoder(w)

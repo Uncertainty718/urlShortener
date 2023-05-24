@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -28,10 +26,6 @@ func NewPostgres() *Postgres {
 }
 
 func createConnection() *sql.DB {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading environment")
-	}
 
 	db, err := sql.Open("postgres", os.Getenv("PG_URL"))
 	if err != nil {
@@ -93,16 +87,26 @@ func (p *Postgres) uniqueCheck(og, short string) error {
 	preparedStatement := `SELECT id FROM urls WHERE originalurl=$1`
 	var id int
 
-	err := db.QueryRow(preparedStatement, og).Scan(&id)
-	if err != sql.ErrNoRows {
-		return err
+	if err := db.QueryRow(preparedStatement, og).Scan(&id); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	}
+
+	if id != 0 {
+		return errNotUnique
 	}
 
 	preparedStatement = `SELECT id FROM urls WHERE shorturl=$1`
 
-	err = db.QueryRow(preparedStatement, short).Scan(&id)
-	if err != sql.ErrNoRows {
-		return err
+	if err := db.QueryRow(preparedStatement, short).Scan(&id); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	}
+
+	if id != 0 {
+		return errNotUniqueShortUrl
 	}
 
 	return nil
