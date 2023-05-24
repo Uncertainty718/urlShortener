@@ -17,22 +17,22 @@ var (
 
 type Handler struct {
 	*chi.Mux
-	Repo storage.Storage
+	repo storage.Storage
 }
 
 func NewHandler(repo storage.Storage) *Handler {
 	h := &Handler{
 		Mux:  chi.NewMux(),
-		Repo: repo,
+		repo: repo,
 	}
 
-	h.Post("/", h.SaveURL())
-	h.Get("/", h.GetURL())
+	h.Post("/", h.saveURL())
+	h.Get("/", h.getURL())
 
 	return h
 }
 
-func (h *Handler) SaveURL() http.HandlerFunc {
+func (h *Handler) saveURL() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		service := shortener.NewShortener()
 		if err := json.NewDecoder(r.Body).Decode(service); err != nil {
@@ -41,7 +41,7 @@ func (h *Handler) SaveURL() http.HandlerFunc {
 		}
 		defer r.Body.Close()
 		service.Shorten()
-		shortened, err := h.Repo.SaveData(service.OriginalURL, service.ShortURL)
+		shortened, err := h.repo.SaveData(service.OriginalURL, service.ShortURL)
 		if err != nil {
 			if err == errNotUniqueShortUrl {
 				service.Reshorten(service.ShortURL)
@@ -62,7 +62,7 @@ func (h *Handler) SaveURL() http.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetURL() http.HandlerFunc {
+func (h *Handler) getURL() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		service := shortener.NewShortener()
 		if err := json.NewDecoder(r.Body).Decode(service); err != nil {
@@ -70,7 +70,7 @@ func (h *Handler) GetURL() http.HandlerFunc {
 			return
 		}
 		defer r.Body.Close()
-		og, err := h.Repo.GetData(service.ShortURL)
+		og, err := h.repo.GetData(service.ShortURL)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return

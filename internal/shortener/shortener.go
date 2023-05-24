@@ -9,12 +9,12 @@ import (
 )
 
 type Shortener struct {
-	OriginalURL string     `json:"originalurl"`
-	ShortURL    string     `json:"shorturl"`
-	randomizer  *rand.Rand `json:"-"`
-	charset     string     `json:"-"`
-	urlLen      string     `json:"-"`
-	myDomain    string     `json:"-"`
+	OriginalURL string `json:"originalurl"`
+	ShortURL    string `json:"shorturl"`
+	randomizer  *rand.Rand
+	charset     string
+	urlLen      string
+	myDomain    string
 }
 
 // Creates new instance of Shortener service.
